@@ -13,4 +13,4 @@ sudo ovs-vsctl add-port switch enp0s10 tag=20
 sudo ip link set enp0s8 up
 sudo ip link set enp0s9 up
 sudo ip link set enp0s10 up
-sudo ip link set dev ovs-system up
+#sudo ip link set dev ovs-system up
