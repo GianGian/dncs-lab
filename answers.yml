@@ -1,0 +1,18 @@
+FirstName: Gianlorenzo
+LastName: Moser
+MatriculationNumber: 213560
+AcademicYear: 2019-2020
+GitHubUrl: https://github.com/GianGian/dncs-lab
+Subnets:
+  HostsA:
+    RequiredAddresses: 161
+    SubnetAddress: 193.168.2.0
+    SubnetPrefixLength: 255.255.255.0
+  HostsB:
+    RequiredAddresses: 436
+    SubnetAddress: 193.168.0.0
+    SubnetPrefixLength: 255.255.254.0
+  Hub:
+    RequiredAddresses: 504
+    SubnetAddress: 172.16.0.0
+    SubnetPrefixLength: 255.255.254.0
