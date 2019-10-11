@@ -124,7 +124,7 @@ The assignment deliverable consists of a Github repository containing:
 3. [Validation](###Validation)
 
 
-### Technicalchoices
+### Technical choices
 
 ### Implementation
 
