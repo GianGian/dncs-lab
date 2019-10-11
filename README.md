@@ -117,4 +117,15 @@ The assignment deliverable consists of a Github repository containing:
 
 
 # Design
-[ Your work goes here ]
+
+## Table of Contents
+1. [Technical choices](##Technical choices)
+2. [Implementation](##Implementation)
+3. [Validation](#Validation)
+
+
+### Technical choices
+
+### Implementation
+
+### Validation
