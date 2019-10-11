@@ -230,18 +230,41 @@ Every subnet hasn't got contiguous addresses (it was not a specification) to mak
 ### Implementation
 #### host-a.sh
 ```sh
-$export DEBIAN_FRONTEND=noninteractive
-$sudo apt-get update
-$sudo apt-get install -y tcpdump --assume-yes
-$sudo apt install -y curl --assume-yes
-$# Startup commands go here
-$sudo ip link set dev enp0s8 up
-$sudo ip addr add 192.168.2.2/24 dev enp0s8
-$sudo ip route del default
-$sudo ip route add default via 192.168.2.1
+1$export DEBIAN_FRONTEND=noninteractive
+2$sudo apt-get update
+3$sudo apt-get install -y tcpdump --assume-yes
+4$sudo apt install -y curl --assume-yes
+5$# Startup commands go here
+6$sudo ip link set dev enp0s8 up
+7$sudo ip addr add 192.168.2.2/24 dev enp0s8
+8$sudo ip route del default
+9$sudo ip route add default via 192.168.2.1
 ```
+_line 2_ - _line 4_: installation of libraries and functions
+_line 6_: interface enp0s8 (eth1) activation
+_line 7_: assignment of the IP address to the interface
+_line 8_: erase of default route 
+_line 9_: defining of default route 
 
 #### host-b.sh
+
+```sh
+1$export DEBIAN_FRONTEND=noninteractive
+2$sudo apt-get update
+3$sudo apt-get install -y tcpdump --assume-yes
+4$sudo apt install -y curl --assume-yes
+5$# Startup commands go here
+6$sudo ip link set dev enp0s8 up
+7$sudo ip addr add 192.168.0.2/23 dev enp0s8
+8$sudo ip route del default
+9$sudo ip route add default via 192.168.0.1
+```
+_line 2_ - _line 4_: installation of libraries and functions
+_line 6_: interface enp0s8 (eth1) activation
+_line 7_: assignment of the IP address to the interface
+_line 8_: erase of default route 
+_line 9_: defining of default route 
+
 #### switch.sh
 #### router-1.sh
 #### router-2.sh
