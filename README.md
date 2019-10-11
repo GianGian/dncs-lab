@@ -228,8 +228,8 @@ Every subnet hasn't got contiguous addresses (it was not a specification) to mak
         +--------------------------------------------------------+
 
 ### Implementation
-####host-a.sh
-
+#### host-a.sh
+```sh
 $export DEBIAN_FRONTEND=noninteractive
 $sudo apt-get update
 $sudo apt-get install -y tcpdump --assume-yes
@@ -239,13 +239,13 @@ $sudo ip link set dev enp0s8 up
 $sudo ip addr add 192.168.2.2/24 dev enp0s8
 $sudo ip route del default
 $sudo ip route add default via 192.168.2.1
+```
 
-
-####host-b.sh
-####switch.sh
-####router-1.sh
-####router-2.sh
-####host-c.sh
+#### host-b.sh
+#### switch.sh
+#### router-1.sh
+#### router-2.sh
+#### host-c.sh
 
 ### Validation
 
