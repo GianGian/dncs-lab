@@ -115,17 +115,109 @@ The assignment deliverable consists of a Github repository containing:
 - https://www.cyberciti.biz/faq/howto-linux-configuring-default-route-with-ipcommand/
 - https://www.vagrantup.com/intro/getting-started/
 
-
 # Design
 
 ## Table of Contents
-1. [Technical choices](###Technicalchoices)
-2. [Implementation](###Implementation)
-3. [Validation](###Validation)
+1. [DNCS-LAB assigment](#DNCS-LAB-assigment)
+2. [Technical choices](#Technical-choices)
+    - [Subnets](#subnets) 
+    - [VLANs](#VLANs) 
+    - [Interface-IP mapping](Interface-IP-mapping)
+    - [Network Map](#Network-Nap)
+3. [Implementation](#implementation)
+4. [Validation](#validation)
 
+### DNCS-LAB assigment
+Design of Networks and Communication Systems
+A.Y. 2019/20
+University of Trento
+
+Starting from a _Vagrantfile_  available at https://github.com/dustnic/dncs-lab the student have to design a simply network configured as above. The design requirements are:
+- Hosts 1-a and 1-b are in two subnets (*Hosts-A* and *Hosts-B*) that must be able to scale up to respectively 161 and 436 usable addresses
+- Host 2-c is in a subnet (*Hub*) that needs to accommodate up to 504 usable addresses
+- Host 2-c must run a docker image (dustnic82/nginx-test) which implements a web-server that must be reachable from Host-1-a and Host-1-b
+- No dynamic routing can be used
+- Routes must be as generic as possible
+- The lab setup must be portable and executed just by launching the vagrant up command
 
 ### Technical choices
+#### Subnets
+I decided to set up four subnets:
+**1**. For the first subnet (between router-1 and host-b) I used the subnet 192.168.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address (2<sup>NofIPV4bits-Nofnetmaskbits</sup>-subnet address-broadcast address).
+**2**. For the second subnet (between router-1 and host-a) I used the subnet 192.168.2.0/24. Indeed these subnet can cover 2<sup>32-24</sup>-2= 254 address.
+**3**. For the third subnet (between router-1 and router-2) I used the subnet 10.10.10.0/30. Indeed these subnet can cover 2<sup>32-30</sup>-2= 2 address.
+**4**. For the fourth subnet (between router-2 and host-c) I used the subnet 172.16.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address.
+
+| Subnet | Devices (Interface)                 | Network address | Netmask        |Broadcast     | # of hosts              |
+| ------ | ------------------------------------| ----------------| ---------------| -------------|------------------------ |
+| 1      | router-1 (eth1.10)<br>host-a (eth1) | 192.168.2.0/24  | 255.255.255.0  | 192.168.2.255| 2<sup>32-24</sup>-2=254 |
+| 2      | router-1 (eth1.20)<br>host-b (eth1) | 192.168.0.0/23  | 255.255.254.0  | 192.168.1.255| 2<sup>32-23</sup>-2=510 |
+| 3      | router-2 (eth1)<br>host-c (eth1)    | 10.10.10.0/30   | 255.255.255.252| 10.10.10.3   | 2<sup>32-30</sup>-2=2   |
+| 4      | router-1 (eth2)<br>router-2 (eth2)  | 172.16.0.0/23   | 255.255.254.0  | 172.16.1.255 | 2<sup>32-23</sup>-2=510 |
+#### VLANs
+Between _router-1_ and _switch_ there are 2 subnets so it is required the use of virtual LANs. So I set up it for network **1** and **2**.
+
+| ID  | Subnet |
+| --- | ------ |
+| 10  | 1      |
+| 20  | 2      |
+
+#### Interface-IP mapping
+
+I decided to give the X.X.X.1 IP to the routers, which will also be the gateways. The hosts so have the X.X.X.2 IP.
+Every subnet hasn't got contiguous addresses (it was not a specification) to make the subdivision of the various subnets clearer.
+
+| Device   | Interface | IP                | Subnet |
+| -------- | --------- | ----------------- | ------ |
+| host-a   | eth1      | 192.168.2.2/24     | 1     |
+| router-1 | eth1.10   | 192.168.2.1/24   | 1      |
+| host-b  | eth1      | 192.168.0.2/23   | 2     |
+| router-1 | eth1.20   | 192.168.0.1/23   |2      |
+| host-c | eth1      | 172.16.0.2/23   | 3     |
+| router-2 | eth1      | 172.16.0.1/23   |3      |
+| router-1 | eth2      | 10.10.10.1/30 | 4      |
+| router-2 | eth2      | 10.10.10.2/30 | 4      |
+
+#### Network Map
+
+        +-----------------------------------------------------+
+        |                                                     |
+        |                                                     |eth0
+        +--+--+                +------------+             +------------+
+        |     |                |            |             |            |
+        |     |            eth0|            |eth2     eth2|            |
+        |     +----------------+  router-1  +-------------+  router-2  |
+        |     |                |            |10.10.10.1   |            |
+        |     |                |            |   10.10.10.2|            |
+        |  M  |                +------------+             +------------+
+        |  A  | eth1.20  192.168.2.1 |eth1.10  192.168.0.1       |eth1 172.16.0.1
+        |  N  |                      |                           |
+        |  A  |                      |                           |eth1 172.16.0.2
+        |  G  |                      |                     +-----+----+
+        |  E  |                      |eth1                 |          |
+        |  M  |            +-------------------+           |          |
+        |  E  |        eth0|                   |           |  host-c  |
+        |  N  +------------+      SWITCH       |           |          |
+        |  T  |            |                   |           |          |
+        |     |            +-------------------+           +----------+
+        |  V  |               |eth2         |eth3                |eth0
+        |  A  |               |             |                    |
+        |  G  |               |             |                    |
+        |  R  |  192.168.2.2  |eth1         |eth1 192.168.0.2    |
+        |  A  |        +----------+     +----------+             |
+        |  N  |        |          |     |          |             |
+        |  T  |    eth0|          |     |          |             |
+        |     +--------+  host-a  |     |  host-b  |             |
+        |     |        |          |     |          |             |
+        |     |        |          |     |          |             |
+        ++-+--+        +----------+     +----------+             |
+        | |                              |eth0                   |
+        | |                              |                       |
+        | +------------------------------+                       |
+        |                                                        |
+        |                                                        |
+        +--------------------------------------------------------+
 
 ### Implementation
-
 ### Validation
+
