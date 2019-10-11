@@ -119,9 +119,9 @@ The assignment deliverable consists of a Github repository containing:
 # Design
 
 ## Table of Contents
-1. [Technical choices](##Technical choices)
-2. [Implementation](##Implementation)
-3. [Validation](#Validation)
+1. [Technical choices](###Technical choices)
+2. [Implementation](###Implementation)
+3. [Validation](###Validation)
 
 
 ### Technical choices
