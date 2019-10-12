@@ -263,10 +263,15 @@ This code will execute the provisioning script named "host-c.sh"
 9$sudo ip route add default via 192.168.2.1
 ```
 _line 2_ - _line 4_: installation of libraries and functions
+
 _line 6_: interface enp0s8 (eth1) activation
+
 _line 7_: assignment of the IP address to the interface
+
 _line 8_: erase of default route 
+
 _line 9_: defining of default route 
+
 
 #### host-b.sh
 
