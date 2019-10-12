@@ -125,16 +125,16 @@ The assignment deliverable consists of a Github repository containing:
     - [Interface-IP mapping](#Interface-IP-mapping)
     - [Network Map](#Network-Map)
 3. [Implementation](#implementation)
+    -[Vagrantfile](#Vagrantfile)
     -[host-a.sh](#host-a.sh)
     -[host-b.sh](#host-b.sh)
     -[switch.sh](#switch.sh)
     -[router-1.sh](#router-1.sh)
     -[router-2.sh](#router-2.sh)
     -[host-c.sh](#host-c.sh)
-
-
-
 4. [Validation](#validation)
+	- [Introduction](#Introduction)
+	- [Some commands to test the work](Some-commands-to-test-the-work)
 
 ### DNCS-LAB assigment
 Design of Networks and Communication Systems
@@ -156,6 +156,9 @@ I decided to set up four subnets:
 **2**. For the second subnet (between router-1 and host-a) I used the subnet 192.168.2.0/24. Indeed these subnet can cover 2<sup>32-24</sup>-2= 254 address.
 **3**. For the third subnet (between router-1 and router-2) I used the subnet 10.10.10.0/30. Indeed these subnet can cover 2<sup>32-30</sup>-2= 2 address.
 **4**. For the fourth subnet (between router-2 and host-c) I used the subnet 172.16.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address.
+
+the choice to use the subnets 192.168.0.0/23 and 192.168.2.0/24 was made to use summerization and so to optimize the rules for re-addressing (in router-2).
+
 
 | Subnet | Devices (Interface)                 | Network address | Netmask        |Broadcast     | # of hosts              |
 | ------ | ------------------------------------| ----------------| ---------------| -------------|------------------------ |
@@ -228,6 +231,25 @@ Every subnet hasn't got contiguous addresses (it was not a specification) to mak
         +--------------------------------------------------------+
 
 ### Implementation
+
+#### Vagrantfile
+The Vagrantfile create and set some settings of the VMs.
+in this case only the part of the host-c was reported; indeed the various configurations are very similar.
+This is the setting for the host-c VM. There is the command to set interface and to allocate the RAM memory.
+```sh
+config.vm.define "host-c" do |hostc|
+    hostc.vm.box = "ubuntu/bionic64"
+    hostc.vm.hostname = "host-c"
+    hostc.vm.network "private_network", virtualbox__intnet: "broadcast_router-south-2", auto_config: false
+    hostc.vm.provision "shell", path: "host-c.sh"
+    hostc.vm.provider "virtualbox" do |vb|
+      vb.memory = 512
+    end
+  end
+```
+
+This code will execute the provisioning script named "host-c.sh"
+
 #### host-a.sh
 ```sh
 1$export DEBIAN_FRONTEND=noninteractive
@@ -266,9 +288,257 @@ _line 8_: erase of default route
 _line 9_: defining of default route 
 
 #### switch.sh
+
+```sh
+1$export DEBIAN_FRONTEND=noninteractive
+2$sudo apt-get update
+3$sudo apt-get install -y tcpdump
+4$sudo apt-get install -y openvswitch-common openvswitch-switch apt-transport-https ca-certificates curl software-properties-common
+5$# Startup commands for switch go here
+6$sudo ovs-vsctl add-br switch
+7$sudo ovs-vsctl add-port switch enp0s8
+8$sudo ovs-vsctl add-port switch enp0s9 tag=10
+9$sudo ovs-vsctl add-port switch enp0s10 tag=20
+10$sudo ip link set enp0s8 up
+11$sudo ip link set enp0s9 up
+12$sudo ip link set enp0s10 up
+```
+_line 2_ - _line 4_: installation of libraries and functions
+_line 6_: switch creation
+_line 7_: interface enp0s8 (eth1) creation
+_line 8_: interface enp0s9 (eth2) creation with VLAN tag
+_line 9_: interface enp0s10 (eth3) creation with VLAN tag
+_line 10_: interface enp0s8 (eth1) activation (between switch and router-1)
+_line 11_: interface enp0s9 (eth2) activation (between switch and host-a)
+_line 12_: interface enp0s10 (eth3) activation (between switch and host-b)
+
 #### router-1.sh
+
+```sh
+1$export DEBIAN_FRONTEND=noninteractive
+2$sudo apt-get update
+3$sudo apt-get install -y tcpdump --assume-yes
+4$sudo apt install -y curl --assume-yes
+5$# Startup commands go here
+6$sudo sysctl -w net.ipv4.ip_forward=1
+7$sudo ip link add link enp0s8 name enp0s8.10 type vlan id 10
+8$sudo ip link add link enp0s8 name enp0s8.20 type vlan id 20
+9$sudo ip link add link enp0s9 name enp0s9
+10$sudo ip link set enp0s8 up
+11$sudo ip link set enp0s8.10 up
+12$sudo ip link set enp0s8.20 up
+13$sudo ip link set enp0s9 up
+14$sudo ip addr add 192.168.2.1/24 dev enp0s8.10
+15$sudo ip addr add 192.168.0.1/23 dev enp0s8.20
+16$sudo ip addr add 10.10.10.1/30 dev enp0s9
+17$sudo ip route del default
+18$sudo ip route add 172.16.0.0/23 via 10.10.10.2
+```
+_line 2_ - _line 4_: installation of libraries and functions
+_line 6_: enables the ability to reroute packages
+_line 7_ - _line 8_: interface enp0s8 (eth1) creation with VLAN tag
+_line 9_: interface enp0s9 (eth2) creation
+_line 10_ - _line 12_: interface enp0s8 (eth1) activation
+_line 13_: interface enp0s9 (eth2) activation
+_line 14_ - _line 16_: assignment of the IP address to the interface 
+_line 17_: erase of default route 
+_line 18_: defining route to reach host-c
+
 #### router-2.sh
+
+```sh
+1$export DEBIAN_FRONTEND=noninteractive
+2$sudo apt-get update
+3$sudo apt-get install -y tcpdump --assume-yes
+4$sudo apt install -y curl --assume-yes
+5$# Startup commands go here
+6$sudo sysctl -w net.ipv4.ip_forward=1
+7$sudo ip link add link enp0s8 name enp0s8
+8$sudo ip link add link enp0s9 name enp0s9
+9$sudo ip link set enp0s8 up
+10$sudo ip link set enp0s9 up
+11$sudo ip addr add 172.16.0.1/23 dev enp0s8
+12$sudo ip addr add 10.10.10.2/30 dev enp0s9
+13$sudo ip route del default
+14$sudo ip route add 192.168.0.0/22 via 10.10.10.1
+```
+_line 2_ - _line 4_: installation of libraries and functions
+_line 6_: enables the ability to reroute packages
+_line 7_: interface enp0s8 (eth1) creation
+_line 8_: interface enp0s9 (eth2) creation
+_line 9_: interface enp0s8 (eth1) activation
+_line 10_: interface enp0s9 (eth2) activation
+_line 11_ - _line 12_: assignment of the IP address to the interface 
+_line 13_: erase of default route 
+_line 14_: defining route to reach host-a and host-b using the summerization
+
 #### host-c.sh
 
-### Validation
+```sh
+1$export DEBIAN_FRONTEND=noninteractive
+2$sudo apt-get update
+3$sudo apt-get install -y tcpdump --assume-yes
+4$sudo apt install -y curl --assume-yes
+5$sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common --assume-yes --force-yes
+6$sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+7$sudo apt-key fingerprint 0EBFCD88 | grep docker@docker.com || exit 1
+8$sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+9$sudo apt-get update
+10$sudo apt-get install -y docker-ce --assume-yes --force-yes
+11$# Startup commands go here
+12$sudo docker run --name mybox -p 80:80 -d dustnic82/nginx-test
+13$sudo ip link set dev enp0s8 up
+14$sudo ip addr add 172.16.0.2/23 dev enp0s8
+15$sudo ip route del default
+16$sudo ip route add default via 172.16.0.1
 
+```
+_line 2_ - _line 10_: installation of libraries and functions
+_line 12_: set docker configuration
+_line 13_: interface enp0s8 (eth1) creation
+_line 14_: assignment of the IP address to the interface 
+_line 15_: erase of default route 
+_line 16_: defining of default route 
+
+
+### Validation
+#### Introduction
+To verify the proper functioning of the work it is sufficient to carry out some steps:
+ - Download Vagrant and VirtualBox
+ - Clone the repository from there: https://github.com/GianGian/dncs-lab
+ - Open the power shell (on Windows) or the bash (on Linux), move into the repository and start creating the machines whit the command `vagrant up`. This may take a few minutes.
+ - To switch from a machine from another it can be use the commands `vagrant ssh host-a`(in case of you want to connect with the host-a) and `exit`. 
+
+#### Some commands to test the work
+- To verify the interface status
+ ```sh
+ vagrant@host-a:~$ ip add
+ ```
+The output in this case it's:
+ ```sh
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 02:82:7a:7b:51:94 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3
+       valid_lft 86136sec preferred_lft 86136sec
+    inet6 fe80::82:7aff:fe7b:5194/64 scope link
+       valid_lft forever preferred_lft forever
+3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:0a:1b:8a brd ff:ff:ff:ff:ff:ff
+    inet 192.168.2.2/24 scope global enp0s8
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a00:27ff:fe0a:1b8a/64 scope link
+       valid_lft forever preferred_lft forever
+ ```
+In this case the interface enp0s8 is UP and its IP is 192.168.2.2/24.
+
+- To verify the routing table
+ ```sh
+vagrant@host-a:~$ ip route
+ ```
+The output in this case it's:
+ ```sh
+default via 192.168.2.1 dev enp0s8
+10.0.2.0/24 dev enp0s3 proto kernel scope link src 10.0.2.15
+10.0.2.2 dev enp0s3 proto dhcp scope link src 10.0.2.15 metric 100
+192.168.2.0/24 dev enp0s8 proto kernel scope link src 192.168.2.2
+ ```
+
+- To verify the docker settings
+```sh
+vagrant@host-c:~$ sudo docker ps
+CONTAINER ID        IMAGE                  COMMAND                  CREATED             STATUS              PORTS                         NAMES
+bc832a1692b1        dustnic82/nginx-test   "nginx -g 'daemon of…"   8 minutes ago       Up 8 minutes        0.0.0.0:80->80/tcp, 443/tcp   mybox
+```
+
+- To Verify the mac address table
+```sh
+vagrant@switch:~$ sudo ovs-appctl fdb/show switch
+```
+```sh
+ port  VLAN  MAC                Age
+    1     0  08:00:27:a5:9c:8d  151
+    1    10  08:00:27:a5:9c:8d  151
+    3    20  08:00:27:85:5a:0e  110
+    1    20  08:00:27:a5:9c:8d  110
+    2    10  08:00:27:0a:1b:8a  107
+```
+This is the list of the devices connected at the switch. You can see the MAC-address, their port and if they belong to a VLAN.
+In case the command doesn't work it means that in the .sh file miss this command 'sudo apt-get install -y openvswitch-common openvswitch-switch apt-transport-https ca-certificates curl software-properties-common'.
+
+- To test the connectivity between 2 hosts
+ ```sh
+vagrant@host-b:~$ ping 172.16.0.2
+ ```
+Output:
+ ```sh
+PING 172.16.0.2 (172.16.0.2) 56(84) bytes of data.
+64 bytes from 172.16.0.2: icmp_seq=1 ttl=62 time=1.41 ms
+64 bytes from 172.16.0.2: icmp_seq=2 ttl=62 time=2.48 ms
+64 bytes from 172.16.0.2: icmp_seq=3 ttl=62 time=2.52 ms
+64 bytes from 172.16.0.2: icmp_seq=4 ttl=62 time=2.32 ms
+--- 172.16.0.2 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3006ms
+rtt min/avg/max/mdev = 1.414/2.187/2.527/0.454 ms
+
+ ```
+In this case host-b is able to reach 172.16.0.2 (host-c).
+
+If you disable the interface with the command `vagrant@host-b:~$ sudo ip link set enp0s8 down` the destination became unreachable and with the command `ip add` can be verify that the interface is down.
+
+-To check the route traveled
+ ```sh
+vagrant@host-b:~$ tracepath 172.16.0.2
+ ```
+The output is:
+ ```sh
+ 1?: [LOCALHOST]                      pmtu 1500
+ 1:  _gateway                                              0.587ms
+ 1:  _gateway                                              0.442ms
+ 2:  10.10.10.2                                            0.577ms
+ 3:  172.16.0.2                                            0.774ms reached
+     Resume: pmtu 1500 hops 3 back 3
+ ```
+The package pass through to the gateway (router-1), the router-2 (10.10.10.2) and arrives at the router-c (172.16.0.2)
+
+- To test the operation of the docker
+```sh
+vagrant@host-b:~$ curl 172.16.0.2
+```
+The output is:
+```sh
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+```
+In this case the docker is configured on port 80 (with this command in host-c: 'sudo docker run --name mybox -p 80:80 -d dustnic82/nginx-test'). In case the port is different or it isn't set you have to use this command:
+```sh
+vagrant@host-b:~$ curl 172.16.0.2:32769
+```
+Port 32769 is in this case the dafault port.
