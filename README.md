@@ -262,6 +262,7 @@ This code will execute the provisioning script named "host-c.sh"
 8$sudo ip route del default
 9$sudo ip route add default via 192.168.2.1
 ```
+
 _line 2_ - _line 4_: installation of libraries and functions
 
 _line 6_: interface enp0s8 (eth1) activation
@@ -287,10 +288,15 @@ _line 9_: defining of default route
 9$sudo ip route add default via 192.168.0.1
 ```
 _line 2_ - _line 4_: installation of libraries and functions
+
 _line 6_: interface enp0s8 (eth1) activation
+
 _line 7_: assignment of the IP address to the interface
+
 _line 8_: erase of default route 
+
 _line 9_: defining of default route 
+
 
 #### switch.sh
 
@@ -308,14 +314,23 @@ _line 9_: defining of default route
 11$sudo ip link set enp0s9 up
 12$sudo ip link set enp0s10 up
 ```
+
 _line 2_ - _line 4_: installation of libraries and functions
+
 _line 6_: switch creation
+
 _line 7_: interface enp0s8 (eth1) creation
+
 _line 8_: interface enp0s9 (eth2) creation with VLAN tag
+
 _line 9_: interface enp0s10 (eth3) creation with VLAN tag
+
 _line 10_: interface enp0s8 (eth1) activation (between switch and router-1)
+
 _line 11_: interface enp0s9 (eth2) activation (between switch and host-a)
+
 _line 12_: interface enp0s10 (eth3) activation (between switch and host-b)
+
 
 #### router-1.sh
 
@@ -339,15 +354,25 @@ _line 12_: interface enp0s10 (eth3) activation (between switch and host-b)
 17$sudo ip route del default
 18$sudo ip route add 172.16.0.0/23 via 10.10.10.2
 ```
+
 _line 2_ - _line 4_: installation of libraries and functions
+
 _line 6_: enables the ability to reroute packages
+
 _line 7_ - _line 8_: interface enp0s8 (eth1) creation with VLAN tag
+
 _line 9_: interface enp0s9 (eth2) creation
+
 _line 10_ - _line 12_: interface enp0s8 (eth1) activation
+
 _line 13_: interface enp0s9 (eth2) activation
+
 _line 14_ - _line 16_: assignment of the IP address to the interface 
+
 _line 17_: erase of default route 
+
 _line 18_: defining route to reach host-c
+
 
 #### router-2.sh
 
@@ -367,15 +392,25 @@ _line 18_: defining route to reach host-c
 13$sudo ip route del default
 14$sudo ip route add 192.168.0.0/22 via 10.10.10.1
 ```
+
 _line 2_ - _line 4_: installation of libraries and functions
+
 _line 6_: enables the ability to reroute packages
+
 _line 7_: interface enp0s8 (eth1) creation
+
 _line 8_: interface enp0s9 (eth2) creation
+
 _line 9_: interface enp0s8 (eth1) activation
+
 _line 10_: interface enp0s9 (eth2) activation
+
 _line 11_ - _line 12_: assignment of the IP address to the interface 
+
 _line 13_: erase of default route 
+
 _line 14_: defining route to reach host-a and host-b using the summerization
+
 
 #### host-c.sh
 
@@ -396,14 +431,20 @@ _line 14_: defining route to reach host-a and host-b using the summerization
 14$sudo ip addr add 172.16.0.2/23 dev enp0s8
 15$sudo ip route del default
 16$sudo ip route add default via 172.16.0.1
-
 ```
+
 _line 2_ - _line 10_: installation of libraries and functions
+
 _line 12_: set docker configuration
+
 _line 13_: interface enp0s8 (eth1) creation
+
 _line 14_: assignment of the IP address to the interface 
+
 _line 15_: erase of default route 
+
 _line 16_: defining of default route 
+
 
 
 ### Validation
@@ -454,13 +495,6 @@ default via 192.168.2.1 dev enp0s8
 192.168.2.0/24 dev enp0s8 proto kernel scope link src 192.168.2.2
  ```
 
-- To verify the docker settings
-```sh
-vagrant@host-c:~$ sudo docker ps
-CONTAINER ID        IMAGE                  COMMAND                  CREATED             STATUS              PORTS                         NAMES
-bc832a1692b1        dustnic82/nginx-test   "nginx -g 'daemon of…"   8 minutes ago       Up 8 minutes        0.0.0.0:80->80/tcp, 443/tcp   mybox
-```
-
 - To Verify the mac address table
 ```sh
 vagrant@switch:~$ sudo ovs-appctl fdb/show switch
@@ -475,6 +509,7 @@ vagrant@switch:~$ sudo ovs-appctl fdb/show switch
 ```
 This is the list of the devices connected at the switch. You can see the MAC-address, their port and if they belong to a VLAN.
 In case the command doesn't work it means that in the .sh file miss this command 'sudo apt-get install -y openvswitch-common openvswitch-switch apt-transport-https ca-certificates curl software-properties-common'.
+
 
 - To test the connectivity between 2 hosts
  ```sh
@@ -496,6 +531,7 @@ In this case host-b is able to reach 172.16.0.2 (host-c).
 
 If you disable the interface with the command `vagrant@host-b:~$ sudo ip link set enp0s8 down` the destination became unreachable and with the command `ip add` can be verify that the interface is down.
 
+
 -To check the route traveled
  ```sh
 vagrant@host-b:~$ tracepath 172.16.0.2
@@ -510,6 +546,15 @@ The output is:
      Resume: pmtu 1500 hops 3 back 3
  ```
 The package pass through to the gateway (router-1), the router-2 (10.10.10.2) and arrives at the router-c (172.16.0.2)
+
+
+- To verify the docker settings
+```sh
+vagrant@host-c:~$ sudo docker ps
+CONTAINER ID        IMAGE                  COMMAND                  CREATED             STATUS              PORTS                         NAMES
+bc832a1692b1        dustnic82/nginx-test   "nginx -g 'daemon of…"   8 minutes ago       Up 8 minutes        0.0.0.0:80->80/tcp, 443/tcp   mybox
+```
+
 
 - To test the operation of the docker
 ```sh
