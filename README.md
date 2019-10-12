@@ -121,7 +121,7 @@ The assignment deliverable consists of a Github repository containing:
 1. [DNCS-LAB assigment](#DNCS-LAB-assigment)
 2. [Technical choices](#Technical-choices)
     - [Subnets](#subnets) 
-    - [VLANs](#VLANs) 
+    - [VLAN](#VLAN) 
     - [Interface-IP mapping](#Interface-IP-mapping)
     - [Network Map](#Network-Map)
 3. [Implementation](#implementation)
@@ -166,8 +166,8 @@ the choice to use the subnets 192.168.0.0/23 and 192.168.2.0/24 was made to use 
 | 2      | router-1 (eth1.20)<br>host-b (eth1) | 192.168.0.0/23  | 255.255.254.0  | 192.168.1.255| 2<sup>32-23</sup>-2=510 |
 | 3      | router-2 (eth1)<br>host-c (eth1)    | 10.10.10.0/30   | 255.255.255.252| 10.10.10.3   | 2<sup>32-30</sup>-2=2   |
 | 4      | router-1 (eth2)<br>router-2 (eth2)  | 172.16.0.0/23   | 255.255.254.0  | 172.16.1.255 | 2<sup>32-23</sup>-2=510 |
-#### VLANs
-Between _router-1_ and _switch_ there are 2 subnets so it is required the use of virtual LANs. So I set up it for network **1** and **2**.
+#### VLAN
+Between _router-1_ and _switch_ there are 2 subnets so it is required the use of virtual LAN. So I set up it for network **1** and **2**.
 
 | ID  | Subnet |
 | --- | ------ |
@@ -252,15 +252,15 @@ This code will execute the provisioning script named "host-c.sh"
 
 #### host-a.sh
 ```sh
-1$export DEBIAN_FRONTEND=noninteractive
-2$sudo apt-get update
-3$sudo apt-get install -y tcpdump --assume-yes
-4$sudo apt install -y curl --assume-yes
-5$# Startup commands go here
-6$sudo ip link set dev enp0s8 up
-7$sudo ip addr add 192.168.2.2/24 dev enp0s8
-8$sudo ip route del default
-9$sudo ip route add default via 192.168.2.1
+1. export DEBIAN_FRONTEND=noninteractive
+2. sudo apt-get update
+3. sudo apt-get install -y tcpdump --assume-yes
+4. sudo apt install -y curl --assume-yes
+5. # Startup commands go here
+6. sudo ip link set dev enp0s8 up
+7. sudo ip addr add 192.168.2.2/24 dev enp0s8
+8. sudo ip route del default
+9. sudo ip route add default via 192.168.2.1
 ```
 
 _line 2_ - _line 4_: installation of libraries and functions
@@ -277,15 +277,15 @@ _line 9_: defining of default route
 #### host-b.sh
 
 ```sh
-1$export DEBIAN_FRONTEND=noninteractive
-2$sudo apt-get update
-3$sudo apt-get install -y tcpdump --assume-yes
-4$sudo apt install -y curl --assume-yes
-5$# Startup commands go here
-6$sudo ip link set dev enp0s8 up
-7$sudo ip addr add 192.168.0.2/23 dev enp0s8
-8$sudo ip route del default
-9$sudo ip route add default via 192.168.0.1
+1. export DEBIAN_FRONTEND=noninteractive
+2. sudo apt-get update
+3. sudo apt-get install -y tcpdump --assume-yes
+4. sudo apt install -y curl --assume-yes
+5. # Startup commands go here
+6. sudo ip link set dev enp0s8 up
+7. sudo ip addr add 192.168.0.2/23 dev enp0s8
+8. sudo ip route del default
+9. sudo ip route add default via 192.168.0.1
 ```
 _line 2_ - _line 4_: installation of libraries and functions
 
@@ -301,18 +301,18 @@ _line 9_: defining of default route
 #### switch.sh
 
 ```sh
-1$export DEBIAN_FRONTEND=noninteractive
-2$sudo apt-get update
-3$sudo apt-get install -y tcpdump
-4$sudo apt-get install -y openvswitch-common openvswitch-switch apt-transport-https ca-certificates curl software-properties-common
-5$# Startup commands for switch go here
-6$sudo ovs-vsctl add-br switch
-7$sudo ovs-vsctl add-port switch enp0s8
-8$sudo ovs-vsctl add-port switch enp0s9 tag=10
-9$sudo ovs-vsctl add-port switch enp0s10 tag=20
-10$sudo ip link set enp0s8 up
-11$sudo ip link set enp0s9 up
-12$sudo ip link set enp0s10 up
+1. export DEBIAN_FRONTEND=noninteractive
+2. sudo apt-get update
+3. sudo apt-get install -y tcpdump
+4. sudo apt-get install -y openvswitch-common openvswitch-switch apt-transport-https ca-certificates curl software-properties-common
+5. # Startup commands for switch go here
+6. sudo ovs-vsctl add-br switch
+7. sudo ovs-vsctl add-port switch enp0s8
+8. sudo ovs-vsctl add-port switch enp0s9 tag=10
+9. sudo ovs-vsctl add-port switch enp0s10 tag=20
+10. sudo ip link set enp0s8 up
+11. sudo ip link set enp0s9 up
+12. sudo ip link set enp0s10 up
 ```
 
 _line 2_ - _line 4_: installation of libraries and functions
@@ -335,24 +335,24 @@ _line 12_: interface enp0s10 (eth3) activation (between switch and host-b)
 #### router-1.sh
 
 ```sh
-1$export DEBIAN_FRONTEND=noninteractive
-2$sudo apt-get update
-3$sudo apt-get install -y tcpdump --assume-yes
-4$sudo apt install -y curl --assume-yes
-5$# Startup commands go here
-6$sudo sysctl -w net.ipv4.ip_forward=1
-7$sudo ip link add link enp0s8 name enp0s8.10 type vlan id 10
-8$sudo ip link add link enp0s8 name enp0s8.20 type vlan id 20
-9$sudo ip link add link enp0s9 name enp0s9
-10$sudo ip link set enp0s8 up
-11$sudo ip link set enp0s8.10 up
-12$sudo ip link set enp0s8.20 up
-13$sudo ip link set enp0s9 up
-14$sudo ip addr add 192.168.2.1/24 dev enp0s8.10
-15$sudo ip addr add 192.168.0.1/23 dev enp0s8.20
-16$sudo ip addr add 10.10.10.1/30 dev enp0s9
-17$sudo ip route del default
-18$sudo ip route add 172.16.0.0/23 via 10.10.10.2
+1. export DEBIAN_FRONTEND=noninteractive
+2. sudo apt-get update
+3. sudo apt-get install -y tcpdump --assume-yes
+4. sudo apt install -y curl --assume-yes
+5. # Startup commands go here
+6. sudo sysctl -w net.ipv4.ip_forward=1
+7. sudo ip link add link enp0s8 name enp0s8.10 type vlan id 10
+8. sudo ip link add link enp0s8 name enp0s8.20 type vlan id 20
+9. sudo ip link add link enp0s9 name enp0s9
+10. sudo ip link set enp0s8 up
+11. sudo ip link set enp0s8.10 up
+12. sudo ip link set enp0s8.20 up
+13. sudo ip link set enp0s9 up
+14. sudo ip addr add 192.168.2.1/24 dev enp0s8.10
+15. sudo ip addr add 192.168.0.1/23 dev enp0s8.20
+16. sudo ip addr add 10.10.10.1/30 dev enp0s9
+17. sudo ip route del default
+18. sudo ip route add 172.16.0.0/23 via 10.10.10.2
 ```
 
 _line 2_ - _line 4_: installation of libraries and functions
@@ -377,20 +377,20 @@ _line 18_: defining route to reach host-c
 #### router-2.sh
 
 ```sh
-1$export DEBIAN_FRONTEND=noninteractive
-2$sudo apt-get update
-3$sudo apt-get install -y tcpdump --assume-yes
-4$sudo apt install -y curl --assume-yes
-5$# Startup commands go here
-6$sudo sysctl -w net.ipv4.ip_forward=1
-7$sudo ip link add link enp0s8 name enp0s8
-8$sudo ip link add link enp0s9 name enp0s9
-9$sudo ip link set enp0s8 up
-10$sudo ip link set enp0s9 up
-11$sudo ip addr add 172.16.0.1/23 dev enp0s8
-12$sudo ip addr add 10.10.10.2/30 dev enp0s9
-13$sudo ip route del default
-14$sudo ip route add 192.168.0.0/22 via 10.10.10.1
+1. export DEBIAN_FRONTEND=noninteractive
+2. sudo apt-get update
+3. sudo apt-get install -y tcpdump --assume-yes
+4. sudo apt install -y curl --assume-yes
+5. # Startup commands go here
+6. sudo sysctl -w net.ipv4.ip_forward=1
+7. sudo ip link add link enp0s8 name enp0s8
+8. sudo ip link add link enp0s9 name enp0s9
+9. sudo ip link set enp0s8 up
+10. sudo ip link set enp0s9 up
+11. sudo ip addr add 172.16.0.1/23 dev enp0s8
+12. sudo ip addr add 10.10.10.2/30 dev enp0s9
+13. sudo ip route del default
+14. sudo ip route add 192.168.0.0/22 via 10.10.10.1
 ```
 
 _line 2_ - _line 4_: installation of libraries and functions
@@ -415,22 +415,22 @@ _line 14_: defining route to reach host-a and host-b using the summerization
 #### host-c.sh
 
 ```sh
-1$export DEBIAN_FRONTEND=noninteractive
-2$sudo apt-get update
-3$sudo apt-get install -y tcpdump --assume-yes
-4$sudo apt install -y curl --assume-yes
-5$sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common --assume-yes --force-yes
-6$sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-7$sudo apt-key fingerprint 0EBFCD88 | grep docker@docker.com || exit 1
-8$sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-9$sudo apt-get update
-10$sudo apt-get install -y docker-ce --assume-yes --force-yes
-11$# Startup commands go here
-12$sudo docker run --name mybox -p 80:80 -d dustnic82/nginx-test
-13$sudo ip link set dev enp0s8 up
-14$sudo ip addr add 172.16.0.2/23 dev enp0s8
-15$sudo ip route del default
-16$sudo ip route add default via 172.16.0.1
+1. export DEBIAN_FRONTEND=noninteractive
+2. sudo apt-get update
+3. sudo apt-get install -y tcpdump --assume-yes
+4. sudo apt install -y curl --assume-yes
+5. sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common --assume-yes --force-yes
+6. sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+7. sudo apt-key fingerprint 0EBFCD88 | grep docker@docker.com || exit 1
+8. sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+9. sudo apt-get update
+10. sudo apt-get install -y docker-ce --assume-yes --force-yes
+11. # Startup commands go here
+12. sudo docker run --name mybox -p 80:80 -d dustnic82/nginx-test
+13. sudo ip link set dev enp0s8 up
+14. sudo ip addr add 172.16.0.2/23 dev enp0s8
+15. sudo ip route del default
+16. sudo ip route add default via 172.16.0.1
 ```
 
 _line 2_ - _line 10_: installation of libraries and functions
