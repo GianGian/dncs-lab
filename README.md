@@ -153,9 +153,13 @@ Starting from a _Vagrantfile_  available at https://github.com/dustnic/dncs-lab 
 #### Subnets
 I decided to set up four subnets:
 **1**. For the first subnet (between router-1 and host-b) I used the subnet 192.168.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address (2<sup>NofIPV4bits-Nofnetmaskbits</sup>-subnet address-broadcast address).
+
 **2**. For the second subnet (between router-1 and host-a) I used the subnet 192.168.2.0/24. Indeed these subnet can cover 2<sup>32-24</sup>-2= 254 address.
+
 **3**. For the third subnet (between router-1 and router-2) I used the subnet 10.10.10.0/30. Indeed these subnet can cover 2<sup>32-30</sup>-2= 2 address.
+
 **4**. For the fourth subnet (between router-2 and host-c) I used the subnet 172.16.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address.
+
 
 the choice to use the subnets 192.168.0.0/23 and 192.168.2.0/24 was made to use summerization and so to optimize the rules for re-addressing (in router-2).
 
@@ -532,7 +536,7 @@ In this case host-b is able to reach 172.16.0.2 (host-c).
 If you disable the interface with the command `vagrant@host-b:~$ sudo ip link set enp0s8 down` the destination became unreachable and with the command `ip add` can be verify that the interface is down.
 
 
--To check the route traveled
+- To check the route traveled
  ```sh
 vagrant@host-b:~$ tracepath 172.16.0.2
  ```
