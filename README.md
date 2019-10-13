@@ -239,7 +239,7 @@ Every subnet hasn't got contiguous addresses (it was not a specification) to mak
 #### Vagrantfile
 The Vagrantfile create and set some settings of the VMs.
 in this case only the part of the host-c was reported; indeed the various configurations are very similar.
-This is the setting for the host-c VM. There is the command to set interface and to allocate the RAM memory.
+This is the setting for the host-c VM. There is the command to set interface and to allocate the RAM memory and only in this case it has been changed (from 256 to 512).
 ```sh
 config.vm.define "host-c" do |hostc|
     hostc.vm.box = "ubuntu/bionic64"
@@ -498,6 +498,7 @@ default via 192.168.2.1 dev enp0s8
 10.0.2.2 dev enp0s3 proto dhcp scope link src 10.0.2.15 metric 100
 192.168.2.0/24 dev enp0s8 proto kernel scope link src 192.168.2.2
  ```
+You can see that is has been set a default via (192.168.2.1) but there are other via that connect the host-a and the Management Vagrant (eth0).
 
 - To Verify the mac address table
 ```sh
@@ -555,9 +556,15 @@ The package pass through to the gateway (router-1), the router-2 (10.10.10.2) an
 - To verify the docker settings
 ```sh
 vagrant@host-c:~$ sudo docker ps
+```
+
+Output:
+
+```sh
 CONTAINER ID        IMAGE                  COMMAND                  CREATED             STATUS              PORTS                         NAMES
 bc832a1692b1        dustnic82/nginx-test   "nginx -g 'daemon of…"   8 minutes ago       Up 8 minutes        0.0.0.0:80->80/tcp, 443/tcp   mybox
 ```
+You can see some settings and details about the docker.
 
 
 - To test the operation of the docker
@@ -595,4 +602,4 @@ In this case the docker is configured on port 80 (with this command in host-c: '
 ```sh
 vagrant@host-b:~$ curl 172.16.0.2:32769
 ```
-Port 32769 is in this case the dafault port.
+Port 32769 is in this case the default port.
