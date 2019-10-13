@@ -126,7 +126,7 @@ The assignment deliverable consists of a Github repository containing:
     - [Network Map](#Network-Map)
 3. [Implementation](#implementation)
     - [Vagrantfile](#Vagrantfile)
-    - [host-a.sh](#host-a.sh)
+    - [host-a.sh](#host-ash)
     - [host-b.sh](#host-b.sh)
     - [switch.sh](#switch.sh)
     - [router-1.sh](#router-1.sh)
@@ -134,7 +134,7 @@ The assignment deliverable consists of a Github repository containing:
     - [host-c.sh](#host-c.sh)
 4. [Validation](#validation)
 	- [Introduction](#Introduction)
-	- [Some commands to test the work](Some-commands-to-test-the-work)
+	- [Some commands to test the work](#Some-commands-to-test-the-work)
 
 ### DNCS-LAB assigment
 Design of Networks and Communication Systems
