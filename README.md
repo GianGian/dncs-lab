@@ -189,10 +189,11 @@ Every subnet hasn't got contiguous addresses (it was not a specification) to mak
 | router-1 | eth1.10   | 192.168.2.1/24   | 1      |
 | host-b  | eth1      | 192.168.0.2/23   | 2     |
 | router-1 | eth1.20   | 192.168.0.1/23   |2      |
-| host-c | eth1      | 172.16.0.2/23   | 4    |
-| router-2 | eth1      | 172.16.0.1/23   |4      |
 | router-1 | eth2      | 10.10.10.1/30 | 3     |
 | router-2 | eth2      | 10.10.10.2/30 | 3      |
+| host-c | eth1      | 172.16.0.2/23   | 4    |
+| router-2 | eth1      | 172.16.0.1/23   |4      |
+
 
 #### Network Map
 
