@@ -472,7 +472,7 @@ To verify the proper functioning of the work it is sufficient to carry out some 
  ```sh
  vagrant@host-a:~$ ip add
  ```
-The output in this case it's:
+The output in this case is:
  ```sh
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -499,7 +499,7 @@ In this case the interface enp0s8 is UP and its IP is 192.168.2.2/24.
  ```sh
 vagrant@host-a:~$ ip route
  ```
-The output in this case it's:
+The output in this case is:
  ```sh
 default via 192.168.2.1 dev enp0s8
 10.0.2.0/24 dev enp0s3 proto kernel scope link src 10.0.2.15
