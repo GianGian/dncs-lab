@@ -138,8 +138,11 @@ The assignment deliverable consists of a Github repository containing:
 
 ### DNCS-LAB assigment
 Design of Networks and Communication Systems
+
 A.Y. 2019/20
+
 University of Trento
+
 
 Starting from a _Vagrantfile_  available at https://github.com/dustnic/dncs-lab the student have to design a simply network configured as above. The design requirements are:
 - Hosts 1-a and 1-b are in two subnets (*Hosts-A* and *Hosts-B*) that must be able to scale up to respectively 161 and 436 usable addresses
