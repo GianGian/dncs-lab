@@ -152,16 +152,16 @@ Starting from a _Vagrantfile_  available at https://github.com/dustnic/dncs-lab 
 ### Technical choices
 #### Subnets
 I decided to set up four subnets:
-**1**. For the first subnet (between router-1 and host-b) I used the subnet 192.168.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address (2<sup>NofIPV4bits-Nofnetmaskbits</sup>-subnet address-broadcast address).
+**1**. For the first subnet (between router-1 and host-b) I used the subnet 192.168.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address (2<sup>NofIPV4bits-Nofnetmaskbits</sup>-subnet address-broadcast address) (minimun required to cover 436 hosts).
 
-**2**. For the second subnet (between router-1 and host-a) I used the subnet 192.168.2.0/24. Indeed these subnet can cover 2<sup>32-24</sup>-2= 254 address.
+**2**. For the second subnet (between router-1 and host-a) I used the subnet 192.168.2.0/24. Indeed these subnet can cover 2<sup>32-24</sup>-2= 254 address (minimun required to cover 161 hosts).
 
 **3**. For the third subnet (between router-1 and router-2) I used the subnet 10.10.10.0/30. Indeed these subnet can cover 2<sup>32-30</sup>-2= 2 address.
 
-**4**. For the fourth subnet (between router-2 and host-c) I used the subnet 172.16.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address.
+**4**. For the fourth subnet (between router-2 and host-c) I used the subnet 172.16.0.0/23. Indeed these subnet can cover 2<sup>32-23</sup>-2= 510 address (minimun required to cover 504 hosts).
 
 
-the choice to use the subnets 192.168.0.0/23 and 192.168.2.0/24 was made to use summerization and so to optimize the rules for re-addressing (in router-2).
+The choice to use the subnets 192.168.0.0/23 and 192.168.2.0/24 was made to use summerization and so to optimize the rules for routing (in router-2).
 
 
 | Subnet | Devices (Interface)                 | Network address | Netmask        |Broadcast     | # of hosts              |
@@ -171,7 +171,7 @@ the choice to use the subnets 192.168.0.0/23 and 192.168.2.0/24 was made to use 
 | 3      | router-2 (eth1)<br>host-c (eth1)    | 10.10.10.0/30   | 255.255.255.252| 10.10.10.3   | 2<sup>32-30</sup>-2=2   |
 | 4      | router-1 (eth2)<br>router-2 (eth2)  | 172.16.0.0/23   | 255.255.254.0  | 172.16.1.255 | 2<sup>32-23</sup>-2=510 |
 #### VLAN
-Between _router-1_ and _switch_ there are 2 subnets so it is required the use of virtual LAN. So I set up it for network **1** and **2**.
+Between _router-1_ and _switch_ there are 2 subnets so it is required the use of virtual LAN to separete the hosts at level 2. So I set up it for network **1** and **2**.
 
 | ID  | Subnet |
 | --- | ------ |
