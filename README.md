@@ -271,8 +271,7 @@ This code will execute the provisioning script named "host-c.sh"
 5. # Startup commands go here
 6. sudo ip link set dev enp0s8 up
 7. sudo ip addr add 192.168.2.2/24 dev enp0s8
-8. sudo ip route del default
-9. sudo ip route add default via 192.168.2.1
+8. sudo ip route add default via 192.168.2.1
 ```
 
 _line 2_ - _line 4_: installation of libraries and functions
@@ -281,9 +280,7 @@ _line 6_: interface enp0s8 (eth1) activation
 
 _line 7_: assignment of the IP address to the interface
 
-_line 8_: erase of default route 
-
-_line 9_: defining of default route 
+_line 8_: defining of default route 
 
 
 #### host-b.sh
@@ -296,8 +293,7 @@ _line 9_: defining of default route
 5. # Startup commands go here
 6. sudo ip link set dev enp0s8 up
 7. sudo ip addr add 192.168.0.2/23 dev enp0s8
-8. sudo ip route del default
-9. sudo ip route add default via 192.168.0.1
+8. sudo ip route add default via 192.168.0.1
 ```
 _line 2_ - _line 4_: installation of libraries and functions
 
@@ -305,9 +301,7 @@ _line 6_: interface enp0s8 (eth1) activation
 
 _line 7_: assignment of the IP address to the interface
 
-_line 8_: erase of default route 
-
-_line 9_: defining of default route 
+_line 8_: defining of default route 
 
 
 #### switch.sh
@@ -363,8 +357,7 @@ _line 12_: interface enp0s10 (eth3) activation (between switch and host-b)
 14. sudo ip addr add 192.168.2.1/24 dev enp0s8.10
 15. sudo ip addr add 192.168.0.1/23 dev enp0s8.20
 16. sudo ip addr add 10.10.10.1/30 dev enp0s9
-17. sudo ip route del default
-18. sudo ip route add 172.16.0.0/23 via 10.10.10.2
+17. sudo ip route add 172.16.0.0/23 via 10.10.10.2
 ```
 
 _line 2_ - _line 4_: installation of libraries and functions
@@ -381,9 +374,7 @@ _line 13_: interface enp0s9 (eth2) activation
 
 _line 14_ - _line 16_: assignment of the IP address to the interface 
 
-_line 17_: erase of default route 
-
-_line 18_: defining route to reach host-c
+_line 17_: defining route to reach host-c
 
 
 #### router-2.sh
@@ -401,8 +392,7 @@ _line 18_: defining route to reach host-c
 10. sudo ip link set enp0s9 up
 11. sudo ip addr add 172.16.0.1/23 dev enp0s8
 12. sudo ip addr add 10.10.10.2/30 dev enp0s9
-13. sudo ip route del default
-14. sudo ip route add 192.168.0.0/22 via 10.10.10.1
+13. sudo ip route add 192.168.0.0/22 via 10.10.10.1
 ```
 
 _line 2_ - _line 4_: installation of libraries and functions
@@ -419,9 +409,7 @@ _line 10_: interface enp0s9 (eth2) activation
 
 _line 11_ - _line 12_: assignment of the IP address to the interface 
 
-_line 13_: erase of default route 
-
-_line 14_: defining route to reach host-a and host-b using the summerization
+_line 13_: defining route to reach host-a and host-b using the summerization
 
 
 #### host-c.sh
@@ -441,8 +429,7 @@ _line 14_: defining route to reach host-a and host-b using the summerization
 12. sudo docker run --name mybox -p 80:80 -d dustnic82/nginx-test
 13. sudo ip link set dev enp0s8 up
 14. sudo ip addr add 172.16.0.2/23 dev enp0s8
-15. sudo ip route del default
-16. sudo ip route add default via 172.16.0.1
+15. sudo ip route add default via 172.16.0.1
 ```
 
 _line 2_ - _line 10_: installation of libraries and functions
@@ -453,9 +440,7 @@ _line 13_: interface enp0s8 (eth1) creation
 
 _line 14_: assignment of the IP address to the interface 
 
-_line 15_: erase of default route 
-
-_line 16_: defining of default route 
+_line 15_: defining of default route 
 
 
 

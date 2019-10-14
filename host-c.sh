@@ -12,7 +12,7 @@ sudo apt-get install -y docker-ce --assume-yes --force-yes
 sudo docker run --name mybox -p 80:80 -d dustnic82/nginx-test
 sudo ip link set dev enp0s8 up
 sudo ip addr add 172.16.0.2/23 dev enp0s8
-sudo ip route del default
+#sudo ip route del default
 sudo ip route add default via 172.16.0.1
 
 
